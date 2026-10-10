@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>وسيط DZ 🤝 — نجيبولك واش تحوس عليه</title>
+<meta name="description" content="وسيط DZ — حط طلبك ولا عرضك، وحنا نتوسطولك ونتفاوضولك. بلا تعب، بلا تضييع وقت.">
+<!-- 
+  نصيحة 4 من الفيديو: Meta Pixel للتتبع والإعلانات المستهدفة
+  بدّل PIXEL_ID برقم البيكسل تاعك من مدير إعلانات فيسبوك، ونحّي التعليق:
+  <script>!function(f,b,e,v,n,t,s){...}(...);fbq('init','PIXEL_ID');fbq('track','PageView');</script>
+-->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--navy:#0f2440;--navy2:#1a3a63;--green:#10b981;--green-d:#059669;--gold:#f59e0b;--bg:#f4f7fb;--card:#fff;--txt:#1e293b;--muted:#64748b;--wa:#25d366}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.7}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+header{background:var(--navy);color:#fff;padding:14px 0;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+header .wrap{display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:22px;font-weight:900} .logo span{color:var(--gold)}
+.hbtn{background:var(--green);color:#fff;border:0;border-radius:12px;padding:9px 18px;font-weight:800;font-size:14px;cursor:pointer}
+.hero{background:linear-gradient(150deg,var(--navy) 0%,var(--navy2) 100%);color:#fff;padding:44px 0 38px;text-align:center}
+.hero h1{font-size:30px;font-weight:900;margin-bottom:10px}
+.hero h1 span{color:var(--gold)}
+.hero p{font-size:16px;opacity:.92;margin-bottom:24px}
+.cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cta{border:0;border-radius:16px;padding:15px 26px;font-size:17px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:8px}
+.cta.buy{background:var(--green);color:#fff;box-shadow:0 6px 20px rgba(16,185,129,.4)}
+.cta.sell{background:#fff;color:var(--navy)}
+.trust{display:flex;gap:16px;justify-content:center;margin-top:22px;font-size:13px;opacity:.85;flex-wrap:wrap}
+section{padding:34px 0}
+h2{font-size:23px;font-weight:900;text-align:center;margin-bottom:6px;color:var(--navy)}
+.sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:22px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.step{background:var(--card);border-radius:16px;padding:18px 10px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.step .n{font-size:30px;margin-bottom:6px}
+.step b{display:block;font-size:14px;margin-bottom:4px}
+.step small{color:var(--muted);font-size:12px;line-height:1.5}
+.tabs{display:flex;gap:10px;justify-content:center;margin-bottom:18px}
+.tab{border:2px solid #dbe4f0;background:#fff;border-radius:14px;padding:10px 24px;font-weight:800;font-size:15px;cursor:pointer;color:var(--muted)}
+.tab.on{border-color:var(--green);color:var(--navy);background:#ecfdf5}
+.list{display:grid;gap:12px}
+.card{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);border-right:4px solid var(--green)}
+.card.sell{border-right-color:var(--gold)}
+.card .p{font-weight:900;font-size:16px;margin-bottom:4px}
+.card .meta{font-size:13px;color:var(--muted);margin-bottom:10px}
+.card .price{font-size:18px;font-weight:900;color:var(--green-d)}
+.card.sell .price{color:#b45309}
+.card .row{display:flex;gap:10px;margin-top:10px}
+.wabtn{flex:1;background:var(--wa);color:#fff;border:0;border-radius:12px;padding:11px;font-weight:800;font-size:14px;cursor:pointer;text-decoration:none;text-align:center;display:block}
+.empty{text-align:center;color:var(--muted);padding:26px;background:#fff;border-radius:16px;border:2px dashed #dbe4f0}
+form{background:var(--card);border-radius:20px;padding:22px;box-shadow:0 4px 18px rgba(0,0,0,.08)}
+.fgrid{display:grid;gap:12px}
+label{font-size:13px;font-weight:800;color:var(--navy)}
+input,select,textarea{width:100%;border:2px solid #e2e8f0;border-radius:12px;padding:12px;font-size:15px;font-family:inherit;background:#f8fafc}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--green);background:#fff}
+.submit{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;border:0;border-radius:14px;padding:15px;font-size:17px;font-weight:900;cursor:pointer;width:100%;margin-top:4px}
+.submit.sellb{background:linear-gradient(135deg,var(--gold),#d97706)}
+.fswitch{text-align:center;margin-bottom:16px}
+.fswitch button{border:0;background:#eef2f7;padding:10px 22px;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer;color:var(--muted);margin:0 4px}
+.fswitch button.on{background:var(--navy);color:#fff}
+.tst{background:var(--card);border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:12px}
+.tst .stars{color:var(--gold);font-size:16px;margin-bottom:6px}
+.tst p{font-size:14px;margin-bottom:8px}
+.tst small{color:var(--muted)}
+.faq{margin-bottom:10px;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.faq summary{padding:15px 18px;font-weight:800;font-size:15px;cursor:pointer;list-style:none;color:var(--navy)}
+.faq summary::-webkit-details-marker{display:none}
+.faq .a{padding:0 18px 16px;font-size:14px;color:var(--muted)}
+.helpbox{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:20px;padding:26px;text-align:center}
+.helpbox h3{font-size:20px;margin-bottom:8px}
+.helpbox p{opacity:.9;font-size:14px;margin-bottom:16px}
+footer{background:var(--navy);color:#fff;text-align:center;padding:22px;font-size:13px;opacity:.95}
+.wafloat{position:fixed;bottom:20px;left:20px;z-index:60;background:var(--wa);width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 6px 20px rgba(37,211,102,.5);text-decoration:none}
+.toast{position:fixed;bottom:90px;right:50%;transform:translateX(50%);background:var(--navy);color:#fff;padding:13px 24px;border-radius:14px;font-weight:800;font-size:14px;z-index:70;display:none;box-shadow:0 6px 20px rgba(0,0,0,.3);max-width:90%;text-align:center}
+.share-row{display:flex;gap:10px;justify-content:center;margin-top:14px}
+.share-row a{flex:1;max-width:200px;text-align:center;padding:11px;border-radius:12px;font-weight:800;font-size:14px;text-decoration:none}
+.share-wa{background:var(--wa);color:#fff}
+@media(min-width:560px){.steps{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <div class="logo">🤝 وسيط <span>DZ</span></div>
+  <button class="hbtn" onclick="document.getElementById('forms').scrollIntoView({behavior:'smooth'})">حط طلبك</button>
+</div></header>
+
+<div class="hero"><div class="wrap">
+  <h1>تحوس على حاجة؟ <span>نجيبوهالك</span><br>عندك حاجة تبيعها؟ <span>نبيعوهالك</span></h1>
+  <p>حط طلبك ولا عرضك في دقيقة، وحنا نتوسطولك ونتفاوضولك — بلا تعب، بلا تضييع وقت.</p>
+  <div class="cta-row">
+    <button class="cta buy" onclick="showForm('buy')">🔍 حاب نشري</button>
+    <button class="cta sell" onclick="showForm('sell')">📦 حاب نبيع</button>
+  </div>
+  <div class="trust"><span>✅ تفاوض محترف</span><span>✅ بلا ما تحوس بنفسك</span><span>✅ عمولة واضحة</span></div>
+</div></div>
+
+<section><div class="wrap">
+  <h2>كيفاش تخدم؟</h2><p class="sub">ثلاث خطوات برك</p>
+  <div class="steps">
+    <div class="step"><div class="n">1️⃣</div><b>حط طلبك</b><small>واش تحوس ولا واش تبيع + السعر</small></div>
+    <div class="step"><div class="n">2️⃣</div><b>نتوسطولك</b><small>نحوسولك ونتصلو بالطرف الثاني ونتفاوضو</small></div>
+    <div class="step"><div class="n">3️⃣</div><b>تكمل الصفقة</b><small>نربطو بيناتكم وتخلص العمولة المتفق عليها</small></div>
+  </div>
+</div></section>
+
+<section style="background:#fff"><div class="wrap">
+  <h2>آخر الطلبات والعروض</h2><p class="sub">تتحدث مباشرة — لقيت واش تحوس؟ اتصل ديركت</p>
+  <div class="tabs">
+    <button class="tab on" id="tab-buy" onclick="showList('buy')">🔍 طلبات الشراء</button>
+    <button class="tab" id="tab-sell" onclick="showList('sell')">📦 عروض البيع</button>
+  </div>
+  <div class="list" id="list"></div>
+</div></section>
+
+<section id="forms"><div class="wrap">
+  <h2>حط طلبك ولا عرضك</h2><p class="sub">نصيحة الفيديو: العملية بسيطة وسريعة — دقيقة برك ⏱️</p>
+  <div class="fswitch">
+    <button id="fs-buy" class="on" onclick="showForm('buy')">🔍 طلب شراء</button>
+    <button id="fs-sell" onclick="showForm('sell')">📦 عرض بيع</button>
+  </div>
+  <form id="form-buy" onsubmit="return submitAd(event,'buy')">
+    <div class="fgrid">
+      <div><label>الاسم الكامل</label><input required id="b-name" placeholder="مثال: أمين بن أحمد"></div>
+      <div><label>رقم الهاتف (واتساب)</label><input required id="b-phone" inputmode="tel" placeholder="05 / 06 / 07 ..."></div>
+      <div><label>واش تحوس عليه؟</label><input required id="b-product" placeholder="مثال: سيارة أكسنت 2015، هاتف سامسونغ..."></div>
+      <div><label>السعر اللي حابو (دج)</label><input id="b-price" type="number" inputmode="numeric" placeholder="مثال: 1500000"></div>
+      <div><label>الولاية</label><select id="b-wilaya"><option value="">كل الولايات</option></select></div>
+      <div><label>تفاصيل إضافية (اختياري)</label><textarea id="b-notes" rows="2" placeholder="اللون، الحالة، أي تفصيل مهم..."></textarea></div>
+      <button class="submit" type="submit">🚀 انشر طلبي</button>
+    </div>
+  </form>
+  <form id="form-sell" style="display:none" onsubmit="return submitAd(event,'sell')">
+    <div class="fgrid">
+      <div><label>الاسم الكامل</label><input required id="s-name" placeholder="مثال: أمين بن أحمد"></div>
+      <div><label>رقم الهاتف (واتساب)</label><input required id="s-phone" inputmode="tel" placeholder="05 / 06 / 07 ..."></div>
+      <div><label>واش عندك تبيع؟</label><input required id="s-product" placeholder="مثال: سيارة أكسنت 2015 نظيفة..."></div>
+      <div><label>السعر (دج)</label><input id="s-price" type="number" inputmode="numeric" placeholder="مثال: 1500000"></div>
+      <div><label>الولاية</label><select id="s-wilaya"><option value="">كل الولايات</option></select></div>
+      <div><label>تفاصيل إضافية (اختياري)</label><textarea id="s-notes" rows="2" placeholder="الحالة، الصور متوفرة واتساب..."></textarea></div>
+      <button class="submit sellb" type="submit">🚀 انشر عرضي</button>
+    </div>
+  </form>
+</div></section>
+
+<section style="background:#fff"><div class="wrap">
+  <h2>آراء زبائننا ⭐</h2><p class="sub">نصيحة الفيديو: آراء الزبائن تبني الثقة</p>
+  <div id="testimonials"><div class="empty">مازال ما كاش آراء — كن أول واحد يجرب ويقيّم 🙌</div></div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>أسئلة شائعة 💬</h2><p class="sub">أجوبة فورية — كيما البوت الآلي 🤖</p>
+  <div class="faq"><details><summary>كيفاش تخدم الوساطة بالضبط؟</summary><div class="a">تحط طلبك ولا عرضك هنا، حنا نحوسولك على الطرف الثاني، نتصلو بيه، نتفاوضو في السعر، ومن بعد نربطو بيناتكم باش تكملو الصفقة.</div></details></div>
+  <div class="faq"><details><summary>شحال العمولة؟</summary><div class="a">عمولة رمزية نتفاهمو عليها <b>قبل</b> ما نبداو — بلا مفاجآت، وتتخلص غير كي تكمل الصفقة.</div></details></div>
+  <div class="faq"><details><summary>واش تضمنو الصفقة؟</summary><div class="a">حنا وسطاء: نحوسو، نتفاوضو، ونربطو. الدفع والمعاينة تكون بينك وبين الطرف الثاني مباشرة.</div></details></div>
+  <div class="faq"><details><summary>كيفاش نخلص العمولة؟</summary><div class="a">BaridiMob ولا CCP — بسيطة وسريعة.</div></details></div>
+  <div class="faq"><details><summary>واش كاين توصيل؟</summary><div class="a">التوصيل تتفاهمو عليه مع الطرف الثاني، ونقدرو نعاونوك باقتراح شركات توصيل.</div></details></div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="helpbox">
+    <h3>تحتاج مساعدة؟ 🙋</h3>
+    <p>نصيحة الفيديو: ما تترددش تطلب المساعدة — حنا هنا نجاوبوك</p>
+    <a class="wabtn" style="max-width:280px;margin:0 auto" href="https://wa.me/213797475073?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20عندي%20سؤال%20على%20وسيط%20DZ">💬 راسلنا واتساب</a>
+    <div class="share-row">
+      <a class="share-wa" href="#" onclick="shareSite(event)">📤 شارك الموقع</a>
+    </div>
+  </div>
+</div></section>
+
+<footer>وسيط DZ 🤝 — الوساطة بلا تعب<br><small>العمولة تُتفق عليها مسبقاً • الدفع عند إتمام الصفقة</small></footer>
+<a class="wafloat" href="https://wa.me/213797475073?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85">💬</a>
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://chosrqzpuczmirrxmnkf.supabase.co';
+const SB_KEY='sb_publishable__e-8by0NKHyY-mnRowNtqg_zRr8Fq_q';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const WA_NUM='213797475073';
+let curList='buy';
+
+// ولايات الجزائر
+const WILAYAS=["أدرار","الشلف","الأغواط","أم البواقي","باتنة","بجاية","بسكرة","بشار","البليدة","البويرة","تمنراست","تبسة","تلمسان","تيارت","تيزي وزو","الجزائر","الجلفة","جيجل","سطيف","سعيدة","سكيكدة","سيدي بلعباس","عنابة","قالمة","قسنطينة","المدية","مستغانم","المسيلة","معسكر","ورقلة","وهران","البيض","إليزي","برج بوعريريج","بومرداس","الطارف","تندوف","تيسمسيلت","الوادي","خنشلة","سوق أهراس","تيبازة","ميلة","عين الدفلى","النعامة","عين تموشنت","غرداية","غليزان","تيميمون","برج باجي مختار","أولاد جلال","بني عباس","عين صالح","عين قزام","تقرت","جانت","المغير","المنيعة"];
+WILAYAS.forEach((w,i)=>{
+  const o1=document.createElement('option');o1.value=w;o1.textContent=(i+1)+' - '+w;
+  const o2=o1.cloneNode(true);
+  document.getElementById('b-wilaya').appendChild(o1);
+  document.getElementById('s-wilaya').appendChild(o2);
+});
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',3000);}
+function showForm(k){
+  document.getElementById('form-buy').style.display=k==='buy'?'block':'none';
+  document.getElementById('form-sell').style.display=k==='sell'?'block':'none';
+  document.getElementById('fs-buy').classList.toggle('on',k==='buy');
+  document.getElementById('fs-sell').classList.toggle('on',k==='sell');
+  document.getElementById('forms').scrollIntoView({behavior:'smooth'});
+}
+function showList(k){
+  curList=k;
+  document.getElementById('tab-buy').classList.toggle('on',k==='buy');
+  document.getElementById('tab-sell').classList.toggle('on',k==='sell');
+  loadList();
+}
+function fmt(n){return n?Number(n).toLocaleString('fr-DZ')+' دج':'—';}
+function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+async function loadList(){
+  const el=document.getElementById('list');
+  el.innerHTML='<div class="empty">⏳ نحملو...</div>';
+  const tbl=curList==='buy'?'wasit_requests':'wasit_offers';
+  const {data,error}=await sb.from(tbl).select('*').order('created_at',{ascending:false}).limit(30);
+  if(error||!data||!data.length){el.innerHTML='<div class="empty">مازال ما كاش '+(curList==='buy'?'طلبات':'عروض')+' — كن الأول 🚀</div>';return;}
+  el.innerHTML=data.map(d=>{
+    const wa='https://wa.me/213'+String(d.phone).replace(/\D/g,'').replace(/^213/,'')+'?text='+encodeURIComponent('السلام عليكم، شفت '+(curList==='buy'?'طلبك':'عرضك')+' في وسيط DZ: '+d.product);
+    return '<div class="card'+(curList==='sell'?' sell':'')+'"><div class="p">'+esc(d.product)+'</div><div class="meta">👤 '+esc(d.name)+' • 📍 '+esc(d.wilaya||'كل الولايات')+(d.notes?' • 📝 '+esc(d.notes):'')+'</div><div class="price">'+fmt(d.price)+'</div><div class="row"><a class="wabtn" href="'+wa+'" target="_blank">💬 راسلو واتساب</a></div></div>';
+  }).join('');
+}
+async function submitAd(e,k){
+  e.preventDefault();
+  const p=k==='buy'?'b-':'s-';
+  const row={
+    name:document.getElementById(p+'name').value.trim(),
+    phone:document.getElementById(p+'phone').value.trim(),
+    product:document.getElementById(p+'product').value.trim(),
+    price:document.getElementById(p+'price').value||null,
+    wilaya:document.getElementById(p+'wilaya').value||null,
+    notes:document.getElementById(p+'notes').value.trim()||null
+  };
+  if(!row.name||!row.phone||!row.product){toast('عمّر الحقول الأساسية');return false;}
+  const tbl=k==='buy'?'wasit_requests':'wasit_offers';
+  const {error}=await sb.from(tbl).insert(row);
+  if(error){toast('كاش مشكل — جرب واتساب ديركت');return false;}
+  e.target.reset();
+  toast('✅ تنشر بنجاح! نتصلو بيك قريب');
+  curList=k;showList(k);
+  document.getElementById('list').scrollIntoView({behavior:'smooth',block:'center'});
+  return false;
+}
+function shareSite(e){
+  e.preventDefault();
+  const txt='🤝 وسيط DZ — تحوس على حاجة ولا تبيع؟ حط طلبك وحنا نتوسطولك: '+location.href;
+  if(navigator.share){navigator.share({text:txt}).catch(()=>{});}
+  else{location.href='https://wa.me/?text='+encodeURIComponent(txt);}
+}
+// تحديث حي للقوائم
+sb.channel('wasit-live')
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'wasit_requests'},()=>{if(curList==='buy')loadList();})
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'wasit_offers'},()=>{if(curList==='sell')loadList();})
+  .subscribe();
+loadList();
+</script>
+</body>
+</html>

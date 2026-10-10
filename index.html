@@ -77,6 +77,13 @@ footer{background:var(--navy);color:#fff;text-align:center;padding:22px;font-siz
 .share-row{display:flex;gap:10px;justify-content:center;margin-top:14px}
 .share-row a{flex:1;max-width:200px;text-align:center;padding:11px;border-radius:12px;font-weight:800;font-size:14px;text-decoration:none}
 .share-wa{background:var(--wa);color:#fff}
+.preview{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.preview img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:2px solid #e2e8f0}
+.imgs{display:flex;gap:8px;margin:10px 0;overflow-x:auto}
+.imgs img{width:110px;height:110px;object-fit:cover;border-radius:12px;cursor:pointer;border:2px solid #eef2f7;flex-shrink:0}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.lightbox img{max-width:100%;max-height:90vh;border-radius:12px}
+.lightbox.on{display:flex}
 @media(min-width:560px){.steps{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
@@ -129,6 +136,7 @@ footer{background:var(--navy);color:#fff;text-align:center;padding:22px;font-siz
       <div><label>السعر اللي حابو (دج)</label><input id="b-price" type="number" inputmode="numeric" placeholder="مثال: 1500000"></div>
       <div><label>الولاية</label><select id="b-wilaya"><option value="">كل الولايات</option></select></div>
       <div><label>تفاصيل إضافية (اختياري)</label><textarea id="b-notes" rows="2" placeholder="اللون، الحالة، أي تفصيل مهم..."></textarea></div>
+      <div><label>📷 صور (اختياري — حتى 3)</label><input type="file" id="b-images" accept="image/*" multiple><div class="preview" id="b-preview"></div></div>
       <button class="submit" type="submit">🚀 انشر طلبي</button>
     </div>
   </form>
@@ -140,6 +148,7 @@ footer{background:var(--navy);color:#fff;text-align:center;padding:22px;font-siz
       <div><label>السعر (دج)</label><input id="s-price" type="number" inputmode="numeric" placeholder="مثال: 1500000"></div>
       <div><label>الولاية</label><select id="s-wilaya"><option value="">كل الولايات</option></select></div>
       <div><label>تفاصيل إضافية (اختياري)</label><textarea id="s-notes" rows="2" placeholder="الحالة، الصور متوفرة واتساب..."></textarea></div>
+      <div><label>📷 صور (اختياري — حتى 3)</label><input type="file" id="s-images" accept="image/*" multiple><div class="preview" id="s-preview"></div></div>
       <button class="submit sellb" type="submit">🚀 انشر عرضي</button>
     </div>
   </form>
@@ -173,6 +182,7 @@ footer{background:var(--navy);color:#fff;text-align:center;padding:22px;font-siz
 <footer>وسيط DZ 🤝 — الوساطة بلا تعب<br><small>العمولة تُتفق عليها مسبقاً • الدفع عند إتمام الصفقة</small></footer>
 <a class="wafloat" href="https://wa.me/213797475073?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85">💬</a>
 <div class="toast" id="toast"></div>
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('on')"><img src="" alt=""></div>
 
 <script>
 const SB_URL='https://chosrqzpuczmirrxmnkf.supabase.co';
@@ -206,6 +216,28 @@ function showList(k){
 }
 function fmt(n){return n?Number(n).toLocaleString('fr-DZ')+' دج':'—';}
 function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+// معاينة الصور قبل النشر
+[['b-images','b-preview'],['s-images','s-preview']].forEach(([fi,pr])=>{
+  document.getElementById(fi).addEventListener('change',e=>{
+    const box=document.getElementById(pr);box.innerHTML='';
+    [...e.target.files].slice(0,3).forEach(f=>{
+      if(!f.type.startsWith('image/'))return;
+      const img=document.createElement('img');img.src=URL.createObjectURL(f);box.appendChild(img);
+    });
+  });
+});
+function openImg(u){const l=document.getElementById('lightbox');l.querySelector('img').src=u;l.classList.add('on');}
+async function uploadImages(files){
+  const urls=[];
+  for(const f of [...files].slice(0,3)){
+    if(!f.type.startsWith('image/')||f.size>5*1024*1024)continue;
+    const ext=(f.name.split('.').pop()||'jpg').slice(0,5);
+    const name=Date.now()+'_'+Math.random().toString(36).slice(2,8)+'.'+ext;
+    const {error}=await sb.storage.from('wasit-images').upload(name,f);
+    if(!error){const {data}=sb.storage.from('wasit-images').getPublicUrl(name);urls.push(data.publicUrl);}
+  }
+  return urls;
+}
 async function loadList(){
   const el=document.getElementById('list');
   el.innerHTML='<div class="empty">⏳ نحملو...</div>';
@@ -214,25 +246,33 @@ async function loadList(){
   if(error||!data||!data.length){el.innerHTML='<div class="empty">مازال ما كاش '+(curList==='buy'?'طلبات':'عروض')+' — كن الأول 🚀</div>';return;}
   el.innerHTML=data.map(d=>{
     const wa='https://wa.me/213'+String(d.phone).replace(/\D/g,'').replace(/^213/,'')+'?text='+encodeURIComponent('السلام عليكم، شفت '+(curList==='buy'?'طلبك':'عرضك')+' في وسيط DZ: '+d.product);
-    return '<div class="card'+(curList==='sell'?' sell':'')+'"><div class="p">'+esc(d.product)+'</div><div class="meta">👤 '+esc(d.name)+' • 📍 '+esc(d.wilaya||'كل الولايات')+(d.notes?' • 📝 '+esc(d.notes):'')+'</div><div class="price">'+fmt(d.price)+'</div><div class="row"><a class="wabtn" href="'+wa+'" target="_blank">💬 راسلو واتساب</a></div></div>';
+    const imgs=(d.images&&d.images.length)?'<div class="imgs">'+d.images.map(u=>'<img loading="lazy" src="'+esc(u)+'" onclick="openImg(\''+esc(u)+'\')">').join('')+'</div>':'';
+    return '<div class="card'+(curList==='sell'?' sell':'')+'"><div class="p">'+esc(d.product)+'</div>'+imgs+'<div class="meta">👤 '+esc(d.name)+' • 📍 '+esc(d.wilaya||'كل الولايات')+(d.notes?' • 📝 '+esc(d.notes):'')+'</div><div class="price">'+fmt(d.price)+'</div><div class="row"><a class="wabtn" href="'+wa+'" target="_blank">💬 راسلو واتساب</a></div></div>';
   }).join('');
 }
 async function submitAd(e,k){
   e.preventDefault();
   const p=k==='buy'?'b-':'s-';
+  const btn=e.target.querySelector('.submit');btn.disabled=true;btn.textContent='⏳ نرفعو الصور...';
+  let images=[];
+  try{images=await uploadImages(document.getElementById(p+'images').files);}
+  catch(_){toast('الصور ما ترفعوش — نكملو بلا صور');}
   const row={
     name:document.getElementById(p+'name').value.trim(),
     phone:document.getElementById(p+'phone').value.trim(),
     product:document.getElementById(p+'product').value.trim(),
     price:document.getElementById(p+'price').value||null,
     wilaya:document.getElementById(p+'wilaya').value||null,
-    notes:document.getElementById(p+'notes').value.trim()||null
+    notes:document.getElementById(p+'notes').value.trim()||null,
+    images:images
   };
-  if(!row.name||!row.phone||!row.product){toast('عمّر الحقول الأساسية');return false;}
+  if(!row.name||!row.phone||!row.product){toast('عمّر الحقول الأساسية');btn.disabled=false;btn.textContent=k==='buy'?'🚀 انشر طلبي':'🚀 انشر عرضي';return false;}
   const tbl=k==='buy'?'wasit_requests':'wasit_offers';
   const {error}=await sb.from(tbl).insert(row);
+  btn.disabled=false;btn.textContent=k==='buy'?'🚀 انشر طلبي':'🚀 انشر عرضي';
   if(error){toast('كاش مشكل — جرب واتساب ديركت');return false;}
   e.target.reset();
+  document.getElementById(p+'preview').innerHTML='';
   toast('✅ تنشر بنجاح! نتصلو بيك قريب');
   curList=k;showList(k);
   document.getElementById('list').scrollIntoView({behavior:'smooth',block:'center'});
